@@ -82,7 +82,7 @@ read -p "🔑 Enter Your Private Key (0x...): " PRIVATE_KEY
 read -p "💰 Enter Your Wallet Address (0x...): " YOUR_ADDRESS
 read -p "🌍 Enter Your IP: " YOUR_IP
 
-cat <<EOF > nano.env
+cat <<EOF > .env
 ETHEREUM_RPC_URL=$RPC_URL
 CONSENSUS_BEACON_URL=$BEACON_URL
 VALIDATOR_PRIVATE_KEY=$PRIVATE_KEY
@@ -90,7 +90,7 @@ COINBASE=$YOUR_ADDRESS
 P2P_IP=$YOUR_IP
 EOF
 
-echo "✅ nano.env created with your inputs."
+echo "✅ .env created with your inputs."
 
 echo "📝 Please enter your Aztec sequencer config values."
 
