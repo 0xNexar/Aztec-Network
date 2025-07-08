@@ -94,3 +94,6 @@ echo "🧱 Starting docker containers..."
 docker compose up -d
 docker compose logs -fn 1000
 
+echo "📂 Moving into ~/aztec folder..."
+cd "$HOME/aztec"
+exec bash
