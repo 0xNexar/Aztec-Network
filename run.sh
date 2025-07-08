@@ -51,8 +51,16 @@ sudo systemctl restart docker
 
 echo "🌐 Installing Aztec..."
 bash -i <(curl -s https://install.aztec.network)
-echo 'export PATH="$HOME/.aztec/bin:$PATH"' >> ~/.bashrc
-source ~/.bashrc
+# Append PATH export to .bashrc only if it's not already there
+if ! grep -q '.aztec/bin' ~/.bashrc; then
+  echo 'export PATH="$HOME/.aztec/bin:$PATH"' >> ~/.bashrc
+  echo "✅ Added Aztec bin directory to ~/.bashrc"
+else
+  echo "✅ Aztec bin directory already in ~/.bashrc"
+fi
+
+# Export PATH immediately in this session
+export PATH="$HOME/.aztec/bin:$PATH"
 
 echo "⬇️ Pulling latest Aztec release..."
 aztec-up latest
