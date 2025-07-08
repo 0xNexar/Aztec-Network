@@ -57,7 +57,6 @@ sudo systemctl restart docker
 echo "🌐 Installing Aztec CLI..."
 bash -i <(curl -s https://install.aztec.network)
 
-# Add Aztec to PATH
 if ! grep -q '.aztec/bin' ~/.bashrc; then
   echo 'export PATH="$HOME/.aztec/bin:$PATH"' >> ~/.bashrc
   echo "✅ Added Aztec bin directory to ~/.bashrc"
@@ -67,7 +66,7 @@ export PATH="$HOME/.aztec/bin:$PATH"
 echo "⬇️ Pulling latest Aztec release..."
 if ! ~/.aztec/bin/aztec-up latest; then
   echo "❌ Failed to pull Aztec image. Retrying with 'docker pull'..."
-  docker pull aztecprotocol/aztec:latest || {
+  docker pull aztecprotocol/aztec:0.87.9 || {
     echo "❌ Docker pull failed. Please check your internet connection and try again."
     exit 1
   }
@@ -78,55 +77,75 @@ sudo apt install -y ufw
 sudo ufw allow 22
 sudo ufw allow ssh
 sudo ufw allow 40400
-sudo ufw allow 8080
+sudo ufw allow 8081
 sudo ufw --force enable
 
 echo "📦 Setting up Aztec sequencer..."
 AZTEC_DIR="$HOME/aztec"
 mkdir -p "$AZTEC_DIR" && cd "$AZTEC_DIR"
 
-echo "📝 Creating Aztec config files..."
+echo "📝 Please enter your Aztec sequencer config values."
 
-# Create .env template
-cat <<EOF > .env
-ETHEREUM_RPC_URL=https://your.ethereum.node
-CONSENSUS_BEACON_URL=https://your.beacon.node
-VALIDATOR_PRIVATE_KEY=0xYourPrivateKey
-COINBASE=0xYourWalletAddress
-P2P_IP=your.public.ip
+read -p "🔗 Ethereum RPC URL: " RPC_URL
+read -p "📡 Consensus Beacon URL: " BEACON_URL
+read -p "🔑 Validator Private Key (0x...): " PRIVATE_KEY
+read -p "💰 Your Coinbase Address (0x...): " YOUR_ADDRESS
+read -p "🌍 Your public P2P IP: " YOUR_IP
+
+cat <<EOF > nano.env
+ETHEREUM_RPC_URL=$RPC_URL
+CONSENSUS_BEACON_URL=$BEACON_URL
+VALIDATOR_PRIVATE_KEY=$PRIVATE_KEY
+COINBASE=$YOUR_ADDRESS
+P2P_IP=$YOUR_IP
 EOF
 
-# Create docker-compose.yml template
+echo "✅ nano.env created with your inputs."
+
+echo "📝 Please enter your Aztec sequencer config values."
+
+read -p "🔗 Ethereum RPC URL: " RPC_URL
+read -p "📡 Consensus Beacon URL: " BEACON_URL
+read -p "🔑 Validator Private Key (0x...): " PRIVATE_KEY
+read -p "💰 Your Coinbase Address (0x...): " YOUR_ADDRESS
+read -p "🌍 Your public P2P IP: " YOUR_IP
+
 cat <<EOF > docker-compose.yml
 version: '3.8'
 
 services:
   aztec-node:
-    image: aztecprotocol/aztec:latest
-    ports:
-      - "40400:40400"
-      - "8080:8080"
+    container_name: aztec-sequencer
+    image: aztecprotocol/aztec:0.87.9
     restart: unless-stopped
-    env_file:
-      - .env
+    environment:
+      ETHEREUM_HOSTS: $RPC_URL
+      L1_CONSENSUS_HOST_URLS: $BEACON_URL
+      DATA_DIRECTORY: /data
+      VALIDATOR_PRIVATE_KEY: $PRIVATE_KEY
+      COINBASE: $YOUR_ADDRESS
+      P2P_IP: $YOUR_IP
+      LOG_LEVEL: debug
+    entrypoint: >
+      sh -c 'node --no-warnings /usr/src/yarn-project/aztec/dest/bin/index.js start --network alpha-testnet --node --archiver --sequencer'    
+    ports:
+      - "8081:8080" 
+      - "40400:40400/tcp"
+      - "40400:40400/udp"
+    volumes:
+      - /root/.aztec/alpha-testnet/data/:/data
 EOF
 
-echo "✅ Templates created."
-echo ""
-echo "🧑 Please edit your .env file now. Press Ctrl+X to save and exit."
-sleep 2
-nano .env
+echo "✅ docker-compose.yml created with your inputs."
 
-echo ""
-echo "🧑 Please review or edit docker-compose.yml. Press Ctrl+X to save and exit."
-sleep 2
-nano docker-compose.yml
-
-echo "✅ Files finalized."
 
 echo "🧱 Starting docker containers..."
 docker compose up -d
 docker compose logs -fn 1000
+
+echo "📂 Moving into ~/aztec folder..."
+cd "$HOME/aztec"
+exec bash
 
 echo "📂 Moving into ~/aztec folder..."
 cd "$HOME/aztec"
