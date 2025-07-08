@@ -22,17 +22,7 @@ cat << "EOF"
 EOF
 echo -e "\e[0m"
 sleep 2
-#!/bin/bash
 
-#!/bin/bash
-
-clear
-echo -e "\e[1;35m"
-cat << "EOF"
-(ASCII Art Banner Here)
-EOF
-echo -e "\e[0m"
-sleep 2
 
 echo "🔧 Updating system and installing dependencies..."
 sudo apt-get update && sudo apt-get upgrade -y
@@ -86,11 +76,11 @@ mkdir -p "$AZTEC_DIR" && cd "$AZTEC_DIR"
 
 echo "📝 Please enter your Aztec sequencer config values."
 
-read -p "🔗 Ethereum RPC URL: " RPC_URL
-read -p "📡 Consensus Beacon URL: " BEACON_URL
-read -p "🔑 Validator Private Key (0x...): " PRIVATE_KEY
-read -p "💰 Your Coinbase Address (0x...): " YOUR_ADDRESS
-read -p "🌍 Your public P2P IP: " YOUR_IP
+read -p "🔗 Enter Your RPC URL: " RPC_URL
+read -p "📡 Enter Your Beacon URL: " BEACON_URL
+read -p "🔑 Enter Your Private Key (0x...): " PRIVATE_KEY
+read -p "💰 Enter Your Wallet Address (0x...): " YOUR_ADDRESS
+read -p "🌍 Enter Your IP: " YOUR_IP
 
 cat <<EOF > nano.env
 ETHEREUM_RPC_URL=$RPC_URL
@@ -104,11 +94,11 @@ echo "✅ nano.env created with your inputs."
 
 echo "📝 Please enter your Aztec sequencer config values."
 
-read -p "🔗 Ethereum RPC URL: " RPC_URL
-read -p "📡 Consensus Beacon URL: " BEACON_URL
-read -p "🔑 Validator Private Key (0x...): " PRIVATE_KEY
-read -p "💰 Your Coinbase Address (0x...): " YOUR_ADDRESS
-read -p "🌍 Your public P2P IP: " YOUR_IP
+read -p "🔗 Enter Your RPC URL: " RPC_URL
+read -p "📡 Enter Your Beacon URL: " BEACON_URL
+read -p "🔑 Enter Your Private Key (0x...): " PRIVATE_KEY
+read -p "💰 Enter Your Wallet Address (0x...): " YOUR_ADDRESS
+read -p "🌍 Enter Your IP: " YOUR_IP
 
 cat <<EOF > docker-compose.yml
 version: '3.8'
