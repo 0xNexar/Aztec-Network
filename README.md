@@ -1,15 +1,20 @@
 # Aztec Sequencer Node — One Command Setup
 
-Launch a full **Aztec Network Testnet Sequencer Node** with one command. This script installs Docker, dependencies, firewall rules, and the latest Aztec binaries — fully automated.
+Launch a full **Aztec Network Testnet Sequencer Node** with one command. This script installs Docker, dependencies, firewall rules, 
+and the latest Aztec binaries `fully automated`.
 
 > 🛠️ **Guide by [0xNexar](https://github.com/0xNexar)**
 
 ---
 
-## ⚠️ Requirements
+## ⚠️Sequencer Node Requirements
 
 - Ubuntu 20.04 / 22.04 VPS  
-- Root access  
+- Root access
+- HW Requirements
+  | RAM       | CPU       | Disk         |
+  |-----------|-----------|--------------|
+  | 8–16 GB   | 4–9 cores | 100+ GB SSD  |
 
 ---
 
@@ -37,59 +42,56 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/0xNexar/Aztec-Network/ma
 
 ✅ This will:
 
-Install system dependencies
+ * Install system dependencies
 
-Install Docker (official method)
+ * Install Docker (official method)
 
-Pull latest Aztec binaries
+ * Pull latest Aztec binaries
 
-Open required ports via UFW
+ * Open required ports via UFW
 
-Start the sequencer node using Docker Compose
+ * Start the sequencer node using Docker Compose
+
+ * No longer need to manually edit the .env or docker-compose.yml files
 
 ---
-
-## 📝 Customize Your `.env` and `docker-compose.yml`
-
-After running the setup script and creating the files `.env` and `docker-compose.yml`, you need to **replace placeholders with your own values**.
-
-### Get Free RPC through [@cerberus_service_bot](http://t.me/cerberus_service_bot) = 3 days Free trial
+✅ After running the setup script, you'll be prompted to enter your configuration details interactively (such as your Ethereum RPC URL, Beacon URL, private key, etc.).
+Once entered, the script will automatically generate the .env and docker-compose.yml files with your values filled in — ready to use!
 ---
 
-nano.ev
+#########################################################
+# 🛠 Other Commands – Useful for Managing Your Node
+#########################################################
+
+# 🔧 Edit Configuration Files
 
 ```
-ETHEREUM_RPC_URL=RPC_URL
-CONSENSUS_BEACON_URL=BEACON_URL
-VALIDATOR_PRIVATE_KEY=0xYourPrivateKey
-COINBASE=0xYourAddress
-P2P_IP=YourIP
+nano .env
+
 ```
 
-docker-compose.yml
 ```
-version: '3.8'
-
-services:
-  aztec-node:
-    container_name: aztec-sequencer
-    image: aztecprotocol/aztec:0.87.9
-    restart: unless-stopped
-    environment:
-      ETHEREUM_HOSTS: RPC_URL
-      L1_CONSENSUS_HOST_URLS: BEACON_URL
-      DATA_DIRECTORY: /data
-      VALIDATOR_PRIVATE_KEY: 0xYourPrivateKey
-      COINBASE: 0xYourAddress
-      P2P_IP: YourIP
-      LOG_LEVEL: debug
-    entrypoint: >
-      sh -c 'node --no-warnings /usr/src/yarn-project/aztec/dest/bin/index.js start --network alpha-testnet --node --archiver --sequencer'    
-    ports:
-      - "8081:8080" 
-      - "40400:40400/tcp"
-      - "40400:40400/udp"
-    volumes:
-      - /root/.aztec/alpha-testnet/data/:/data
+nano docker-compose.yml
 ```
 
+# 📜 View Logs
+
+``` 
+docker compose logs -fn 1000
+```
+
+# 🛑 Stop the Node
+
+```
+# docker compose down -v 
+```
+
+```
+rm -rf ~/.aztec/alpha-testnet/data/
+```
+
+# 🔍 Find Your Node's Peer ID
+
+```
+sudo docker logs $(docker ps -q --filter ancestor=aztecprotocol/aztec:latest | head -n 1) 2>&1 | grep -i "peerId" | grep -o '"peerId":"[^"]*"' | cut -d'"' -f4 | head -n 1
+```
