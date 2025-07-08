@@ -18,7 +18,7 @@ and the latest Aztec binaries `fully automated`.
 
 ---
 
-## 🧰 Step 1: Install `sudo` and `curl` (if missing)
+##  Step 1: Install `sudo` and `curl` (if missing)
 
 If you're on a fresh VPS and see `sudo: command not found` or `curl: command not found`, do this first:
 
